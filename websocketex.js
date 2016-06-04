@@ -1,4 +1,4 @@
-var WebSocketEx = function(address, port, socket) {
+var WebSocketEx = function(address, port, secure, socket) {
     if (typeof socket === 'undefined') {
         socket = this;
         socket.subscribedEvents = {};
@@ -21,7 +21,9 @@ var WebSocketEx = function(address, port, socket) {
 
     address = address || 'localhost';
     port = port || 8080;
-    socket.conn = new WebSocket('ws://'+address+':'+port);
+    secure = secure || false;
+    var protocol = secure ? 'wss' : 'ws';
+    socket.conn = new WebSocket(protocol+'://'+address+':'+port);
 
     socket.conn.onopen = function() {
         socket.connected = true;
@@ -48,7 +50,7 @@ var WebSocketEx = function(address, port, socket) {
             socket.retry = setInterval(function() {
                 console.log('Lost connection to websocket server, attempting to reconnect...');
                 socket.fireCallback(socket.EventEnums.RETRY);
-                socket = new WebSocketEx(address, port, socket);
+                socket = new WebSocketEx(address, port, secure, socket);
             }, 2000);
         }
     };
